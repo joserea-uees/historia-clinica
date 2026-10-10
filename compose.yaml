@@ -75,6 +75,23 @@ services:
     networks:
       - backend_private
 
+  bootstrap-admin:
+    build:
+      context: .
+      target: build
+    profiles: ["tools"]
+    environment:
+      DATABASE_MIGRATION_URL: postgresql://${DB_MIGRATION_USER:?Define DB_MIGRATION_USER en .env}:${DB_MIGRATION_PASSWORD:?Define DB_MIGRATION_PASSWORD en .env}@db:5432/${DB_NAME:?Define DB_NAME en .env}
+      BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL:-}
+      BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:-}
+      BOOTSTRAP_ORGANIZATION_NAME: ${BOOTSTRAP_ORGANIZATION_NAME:-Consultorio principal}
+    command: ["node", "--import", "tsx", "database/bootstrap-admin.ts"]
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - backend_private
+
 networks:
   backend_private:
     internal: true

@@ -1,6 +1,8 @@
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import helmet from 'helmet';
+import * as cookieParser from 'cookie-parser';
+import { NextFunction, Request, Response } from 'express';
 import { AppModule } from './app.module';
 
 async function bootstrap(): Promise<void> {
@@ -8,6 +10,11 @@ async function bootstrap(): Promise<void> {
   const allowedOrigin = process.env.FRONTEND_ORIGIN;
 
   app.use(helmet());
+  app.use(cookieParser());
+  app.use((_request: Request, response: Response, next: NextFunction) => {
+    response.setHeader('Cache-Control', 'no-store');
+    next();
+  });
   app.enableCors({
     origin: allowedOrigin ? allowedOrigin.split(',').map((origin) => origin.trim()) : false,
     credentials: true,

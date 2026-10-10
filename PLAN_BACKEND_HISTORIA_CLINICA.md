@@ -1,8 +1,8 @@
 # Plan maestro: historia clínica digital
 
 **Fecha:** 9 de octubre de 2026  
-**Estado:** fundamento técnico inicial implementado; módulos clínicos y controles de producción pendientes  
-**Prioridad actual:** backend clínico; después, frontend y consulta externa por cédula.
+**Estado:** fundamento técnico y primera iteración de autenticación implementados; módulos clínicos y controles de producción pendientes
+**Prioridad actual:** terminar autorización/auditoría y empezar pacientes e historia; después, frontend y factibilidad de identidad externa.
 
 ## 1. Propósito y supuestos
 
@@ -196,11 +196,19 @@ Cada etapa debe terminar con software demostrable y criterios de salida. Las dur
 4. Implementar la base NestJS, Docker Compose, PostgreSQL, esquema español camelCase y RLS.
 5. Continuar con autenticación, permisos clínicos y módulos de pacientes e historia longitudinal antes de cargar datos reales.
 
-### Estado de la primera entrega técnica
+### Estado de las entregas técnicas
 
-Implementado en esta primera iteración: API NestJS, endpoints de salud/readiness, Helmet, CORS por allowlist, limitación básica de solicitudes, validación global, contenedores Docker, PostgreSQL, migraciones, roles separados y RLS forzado para `persona` y `membresia`. Las instrucciones para levantarlo están en `README.md`.
+Implementado: API NestJS, endpoints de salud/readiness, Docker Compose, PostgreSQL, migraciones versionadas, roles separados, validación global, Helmet, CORS por allowlist y limitación general de solicitudes. La autenticación ahora incluye login/logout, sesión opaca de 12 horas con hash, contraseñas Argon2id, cookies HttpOnly/SameSite, protección CSRF para métodos mutables, sesión actual, lista/selección de organizaciones y alta inicial de administrador sin registro público. Las migraciones 003/004 añaden sesiones, unicidad de correo normalizado y políticas RLS que exigen usuario autenticado y membresía vigente para datos de personas. Las instrucciones están en `README.md`.
 
-Antes de tratar datos reales faltan autenticación y autorización completas, verificación de membresía antes de fijar contexto RLS, MFA, hash Argon2id, cookies/sesiones y CSRF, auditoría clínica, cifrado de campo y gestión de claves, protección contra bots, monitorización de consultas, restricciones de archivos, límites de respuestas, HTTPS de producción, escaneo automatizado de dependencias y revisión legal/clínica.
+Este avance es una base de autenticación y no habilita por sí solo el uso de datos reales. Faltan autorización granular por rol/acción, MFA, auditoría de accesos y cambios clínicos, cifrado de campos sensibles con gestión de claves, endurecimiento contra bots, expiración/invalidez por inactividad y administración de sesiones, monitorización de consultas, límites de respuesta, controles de archivos, TLS/HSTS en el entorno de despliegue, CI para secretos/dependencias/imagen, respaldo y restauración, y revisión legal/clínica. El bootstrap debe ejecutarse solo por un operador confiable y no debe quedar habilitado como un flujo habitual.
+
+### Próximo incremento recomendado
+
+1. Definir y persistir una matriz de permisos por rol, con rutas clínicas protegidas por `@RequireOrganization()` y validación de permisos de acción.
+2. Implementar auditoría append-only de inicio/cierre de sesión, acceso a fichas y cambios, sin copiar notas clínicas a logs.
+3. Implementar pacientes: alta, búsqueda paginada, detalle y actualización, siempre dentro de `withTenantTransaction`.
+4. Añadir verificación de aislamiento entre organizaciones y casos de sesión/CSRF antes de ampliar el dominio clínico.
+5. Después, desarrollar antecedentes y alergias; luego consultas y evolución.
 
 ## 8. Riesgos y decisiones pendientes
 
