@@ -1,14 +1,14 @@
 import { Global, Inject, Injectable, Module, OnModuleDestroy } from '@nestjs/common';
 import { Pool } from 'pg';
-import { DatabaseService } from './database.service';
-import { DATABASE_POOL } from './database.provider';
+import { ServicioBaseDatos } from './servicio-base-datos';
+import { GRUPO_CONEXIONES_BD } from './proveedor-base-datos';
 
 @Injectable()
-class DatabaseShutdownService implements OnModuleDestroy {
-  constructor(@Inject(DATABASE_POOL) private readonly pool: Pool) {}
+class ServicioCierreBaseDatos implements OnModuleDestroy {
+  constructor(@Inject(GRUPO_CONEXIONES_BD) private readonly grupoConexiones: Pool) {}
 
   async onModuleDestroy(): Promise<void> {
-    await this.pool.end();
+    await this.grupoConexiones.end();
   }
 }
 
@@ -16,7 +16,7 @@ class DatabaseShutdownService implements OnModuleDestroy {
 @Module({
   providers: [
     {
-      provide: DATABASE_POOL,
+      provide: GRUPO_CONEXIONES_BD,
       useFactory: () =>
         new Pool({
           host: process.env.DB_HOST,
@@ -30,9 +30,9 @@ class DatabaseShutdownService implements OnModuleDestroy {
           application_name: 'backend-historia-clinica-api',
       }),
     },
-    DatabaseShutdownService,
-    DatabaseService,
+    ServicioCierreBaseDatos,
+    ServicioBaseDatos,
   ],
-  exports: [DATABASE_POOL, DatabaseService],
+  exports: [GRUPO_CONEXIONES_BD, ServicioBaseDatos],
 })
-export class DatabaseModule {}
+export class ModuloBaseDatos {}

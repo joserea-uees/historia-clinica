@@ -7,11 +7,11 @@
     "node": ">=24"
   },
   "scripts": {
-    "start:dev": "nest start --watch",
-    "build": "nest build",
-    "start:prod": "node dist/main.js",
-    "migration:run": "tsx database/migrations/run-migrations.ts",
-    "bootstrap:admin": "tsx database/bootstrap-admin.ts"
+    "iniciar:desarrollo": "nest start --watch",
+    "compilar": "nest build",
+    "iniciar:produccion": "node dist/main.js",
+    "aplicar:migraciones": "tsx database/migrations/aplicar-migraciones.ts",
+    "crear:administrador-inicial": "tsx database/crear-administrador-inicial.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.0",

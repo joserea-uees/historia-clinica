@@ -204,9 +204,9 @@ Este avance es una base de autenticación y no habilita por sí solo el uso de d
 
 ### Próximo incremento recomendado
 
-1. Definir y persistir una matriz de permisos por rol, con rutas clínicas protegidas por `@RequireOrganization()` y validación de permisos de acción.
+1. Definir y persistir una matriz de permisos por rol, con rutas clínicas protegidas por `@RequiereOrganizacion()` y validación de permisos de acción.
 2. Implementar auditoría append-only de inicio/cierre de sesión, acceso a fichas y cambios, sin copiar notas clínicas a logs.
-3. Implementar pacientes: alta, búsqueda paginada, detalle y actualización, siempre dentro de `withTenantTransaction`.
+3. Implementar pacientes: alta, búsqueda paginada, detalle y actualización, siempre dentro de `conTransaccionDeOrganizacion`.
 4. Añadir verificación de aislamiento entre organizaciones y casos de sesión/CSRF antes de ampliar el dominio clínico.
 5. Después, desarrollar antecedentes y alergias; luego consultas y evolución.
 

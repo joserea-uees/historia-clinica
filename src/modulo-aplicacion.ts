@@ -3,11 +3,11 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import * as Joi from 'joi';
-import { DatabaseModule } from './database/database.module';
-import { HealthModule } from './health/health.module';
-import { AuthModule } from './auth/auth.module';
-import { AuthenticationGuard } from './auth/authentication.guard';
-import { OrganizationGuard } from './auth/organization.guard';
+import { ModuloBaseDatos } from './base-datos/modulo-base-datos';
+import { ModuloSalud } from './salud/modulo-salud';
+import { ModuloAutenticacion } from './autenticacion/modulo-autenticacion';
+import { GuardiaAutenticacion } from './autenticacion/guardia-autenticacion';
+import { GuardiaOrganizacion } from './autenticacion/guardia-organizacion';
 
 @Module({
   imports: [
@@ -26,14 +26,14 @@ import { OrganizationGuard } from './auth/organization.guard';
       validationOptions: { allowUnknown: true, abortEarly: false },
     }),
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
-    DatabaseModule,
-    AuthModule,
-    HealthModule,
+    ModuloBaseDatos,
+    ModuloAutenticacion,
+    ModuloSalud,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
-    { provide: APP_GUARD, useClass: AuthenticationGuard },
-    { provide: APP_GUARD, useClass: OrganizationGuard },
+    { provide: APP_GUARD, useClass: GuardiaAutenticacion },
+    { provide: APP_GUARD, useClass: GuardiaOrganizacion },
   ],
 })
-export class AppModule {}
+export class ModuloAplicacion {}

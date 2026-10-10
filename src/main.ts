@@ -1,28 +1,28 @@
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import helmet from 'helmet';
-import * as cookieParser from 'cookie-parser';
+import * as analizadorDeCookies from 'cookie-parser';
 import { NextFunction, Request, Response } from 'express';
-import { AppModule } from './app.module';
+import { ModuloAplicacion } from './modulo-aplicacion';
 
-async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create(AppModule, { bufferLogs: true });
-  const allowedOrigin = process.env.FRONTEND_ORIGIN;
+async function iniciarServidor(): Promise<void> {
+  const aplicacion = await NestFactory.create(ModuloAplicacion, { bufferLogs: true });
+  const origenPermitido = process.env.FRONTEND_ORIGIN;
 
-  app.use(helmet());
-  app.use(cookieParser());
-  app.use((_request: Request, response: Response, next: NextFunction) => {
-    response.setHeader('Cache-Control', 'no-store');
-    next();
+  aplicacion.use(helmet());
+  aplicacion.use(analizadorDeCookies());
+  aplicacion.use((_solicitud: Request, respuesta: Response, siguiente: NextFunction) => {
+    respuesta.setHeader('Cache-Control', 'no-store');
+    siguiente();
   });
-  app.enableCors({
-    origin: allowedOrigin ? allowedOrigin.split(',').map((origin) => origin.trim()) : false,
+  aplicacion.enableCors({
+    origin: origenPermitido ? origenPermitido.split(',').map((origen) => origen.trim()) : false,
     credentials: true,
   });
-  app.enableVersioning({ type: VersioningType.URI });
-  app.setGlobalPrefix('api');
-  app.enableShutdownHooks();
-  app.useGlobalPipes(
+  aplicacion.enableVersioning({ type: VersioningType.URI });
+  aplicacion.setGlobalPrefix('api');
+  aplicacion.enableShutdownHooks();
+  aplicacion.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,
@@ -30,7 +30,7 @@ async function bootstrap(): Promise<void> {
       transformOptions: { enableImplicitConversion: false },
     }),
   );
-  await app.listen(Number(process.env.PORT ?? 3000), '0.0.0.0');
+  await aplicacion.listen(Number(process.env.PORT ?? 3000), '0.0.0.0');
 }
 
-void bootstrap();
+void iniciarServidor();

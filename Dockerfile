@@ -5,7 +5,7 @@ RUN npm ci
 COPY nest-cli.json tsconfig.json tsconfig.build.json ./
 COPY src ./src
 COPY database ./database
-RUN npm run build
+RUN npm run compilar
 
 FROM node:24-alpine AS production
 ENV NODE_ENV=production

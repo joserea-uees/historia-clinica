@@ -23,6 +23,7 @@ services:
       start_period: 10s
     networks:
       - backend_private
+      - local_access
 
   api:
     build:
@@ -53,13 +54,14 @@ services:
         - CMD
         - node
         - -e
-        - "fetch('http://127.0.0.1:3000/api/v1/health/ready').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+        - "fetch('http://127.0.0.1:3000/api/v1/salud/disponible').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 15s
     networks:
       - backend_private
+      - local_access
 
   migrate:
     build:
@@ -68,14 +70,14 @@ services:
     profiles: ["tools"]
     environment:
       DATABASE_MIGRATION_URL: postgresql://${DB_MIGRATION_USER:?Define DB_MIGRATION_USER en .env}:${DB_MIGRATION_PASSWORD:?Define DB_MIGRATION_PASSWORD en .env}@db:5432/${DB_NAME:?Define DB_NAME en .env}
-    command: ["node", "--import", "tsx", "database/migrations/run-migrations.ts"]
+    command: ["node", "--import", "tsx", "database/migrations/aplicar-migraciones.ts"]
     depends_on:
       db:
         condition: service_healthy
     networks:
       - backend_private
 
-  bootstrap-admin:
+  alta-administrador:
     build:
       context: .
       target: build
@@ -85,7 +87,7 @@ services:
       BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL:-}
       BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:-}
       BOOTSTRAP_ORGANIZATION_NAME: ${BOOTSTRAP_ORGANIZATION_NAME:-Consultorio principal}
-    command: ["node", "--import", "tsx", "database/bootstrap-admin.ts"]
+    command: ["node", "--import", "tsx", "database/crear-administrador-inicial.ts"]
     depends_on:
       db:
         condition: service_healthy
@@ -95,6 +97,8 @@ services:
 networks:
   backend_private:
     internal: true
+  local_access:
+    driver: bridge
 
 volumes:
   postgres_data:

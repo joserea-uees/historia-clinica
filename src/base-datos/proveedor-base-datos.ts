@@ -1,0 +1,1 @@
+export const GRUPO_CONEXIONES_BD = Symbol('GRUPO_CONEXIONES_BD');
